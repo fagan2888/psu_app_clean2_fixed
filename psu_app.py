@@ -416,17 +416,19 @@ class PageTwo(tk.Frame):
 
         def info_check():
             info_label = arcpy.SearchCursor(name1, fields="Name_1; ALANDSQM; POP; INCOME; POPULATION")
-            for row in info_label:
-                print("County: {0}, Area: {1}, Pop. Density: {2}, Income: {3}, Population: {4}".format(
-                    row.getValue("Name_1"),
-                    row.getValue("ALANDSQM"),
-                    row.getValue("POP"),
-                    row.getValue("INCOME"),
-                    row.getValue("POPULATION")
-                ))
+            # for row in info_label:
+            #     print("County: {0}, Area: {1}, Pop. Density: {2}, Income: {3}, Population: {4}".format(
+            #         row.getValue("Name_1"),
+            #         row.getValue("ALANDSQM"),
+            #         row.getValue("POP"),
+            #         row.getValue("INCOME"),
+            #         row.getValue("POPULATION")
+            #     ))
             graph = arcpy.Graph()
             graph.addSeriesScatterPlot(name1, fieldY="POP", fieldX="INCOME")
-            arcpy.MakeGraph_management(arcpy.GraphTemplate(), graph, out_graph_name=name1+".grf")
+            graph_tee = "C:\\Users\\zwhitman\\Documents\\census\\psu_app_clean2_backup\\inputs\\graph_template.tee"
+            arcpy.MakeGraph_management(graph_tee, graph, out_graph_name=name1+".grf")
+            # arcpy.MakeGraph_management(arcpy.GraphTemplate(), graph, out_graph_name=name1+".grf")
 
         def dissolve_button_func():
             desc = arcpy.Describe(layer1)
@@ -460,7 +462,7 @@ class PageTwo(tk.Frame):
             arcpy.CalculateField_management(lyr,"RANK","!INCRANK! + !POPRANK!","PYTHON")
 
             #Apply unique symbol symbology from pre-defined symbologyLayer
-            RankSymLayer="C:\Users\zwhitman\Documents\census\psu_app\input\RankSymbology.lyr"
+            RankSymLayer="C:\Users\zwhitman\Documents\census\psu_app_clean2_backup\inputs\PSUSymbology.lyr"
             arcpy.ApplySymbologyFromLayer_management(lyr, RankSymLayer)
 
             #Error If Statements
@@ -495,7 +497,6 @@ class PageTwo(tk.Frame):
                 if desc.fidSet:
                     if layer.name[0:3] == "psu":
                         deletion_layer = layer.name
-                        print deletion_layer
             if deletion_layer[0:3] == "psu":
                 arcpy.Delete_management(fullpath_tmp_state_folder+deletion_layer+".shp", "#")
             else:
